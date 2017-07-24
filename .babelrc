@@ -1,0 +1,16 @@
+{ presets:[
+    'react',
+    ['env', {
+        'targets': {
+            'chrome': 56,
+            'chrome': 57,
+            'chrome': 58,
+            'ie': 10,
+            'ie': 11,
+            'edge': 13,
+            'firefox': 52,
+            'ios': 10.2,
+            'ios': 10.3
+        }
+    }]
+] }
