@@ -1,0 +1,33 @@
+$cell-size: 15px;
+$color-cell-empty: black;
+$color-cell-dungeon: lightgray;
+$color-cell-hero: blue;
+
+.map {
+  display: inline-block;
+}
+
+.map-row {
+  display: table;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.map-cell {
+  display: table-cell;
+  min-width: $cell-size;
+  max-width: $cell-size;
+  height: $cell-size;
+  border: 0;
+}
+
+.map-cell-empty {
+  background-color: $color-cell-empty;
+}
+.map-cell-dungeon {
+  background-color: $color-cell-dungeon;
+}
+.map-cell-hero {
+  background-color: $color-cell-hero;
+}
