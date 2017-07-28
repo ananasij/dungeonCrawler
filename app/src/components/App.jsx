@@ -1,4 +1,5 @@
 import React from 'react';
+import GenerateDungeon from './GenerateDungeon';
 import Map from './Map';
 import Constants from './../Constants';
 
@@ -17,25 +18,13 @@ class App extends React.Component {
 
     componentWillMount() {
         window.addEventListener('keydown', e => this.handleKeyDown(e));
-        this.initMap(Constants.Map.WIDTH, Constants.Map.HEIGHT);
+        this.initGame();
     }
 
-    initMap(width, height) {
-        const map = [];
-        for (let i = 0; i < width; i += 1) {
-            map[i] = [];
-            for (let j = 0; j < height; j += 1) {
-                map[i][j] = EMPTY;
-            }
-        }
-        const dungeonStartX = Math.floor(Math.random() * (width - this.state.dungeonWidth - 1)) + 1;
-        const dungeonStartY = Math.floor(Math.random() * (height - this.state.dungeonHeight - 1)) + 1;
-
-        for (let i = dungeonStartX; i < dungeonStartX + this.state.dungeonWidth; i += 1) {
-            for (let j = dungeonStartY; j < dungeonStartY + this.state.dungeonHeight; j += 1) {
-                map[i][j] = DUNGEON;
-            }
-        }
+    initGame() {
+        const width = Constants.Map.WIDTH;
+        const height = Constants.Map.HEIGHT;
+        const map = GenerateDungeon(width, height);
         const hero = this.initHero(map);
         this.setState({ width, height, map, hero });
     }
@@ -91,14 +80,9 @@ class App extends React.Component {
         const currentMap = this.state.map;
         currentMap[this.state.hero.x][this.state.hero.y] = HERO;
         return (
-            <div
-                tabIndex="0"
-                onKeyPress={this.walk}
-            >
                 <Map
                     map={this.state.map}
                 />
-            </div>
         );
     }
 }

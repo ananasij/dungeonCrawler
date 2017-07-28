@@ -5,8 +5,11 @@ const Constants = {
         HERO: 'HERO'
     },
     Map: {
-        WIDTH: 20,
-        HEIGHT: 15
+        WIDTH: 50,
+        HEIGHT: 60,
+        MINROOMSIDE: 5,
+        MAXROOMSIDE: 15,
+        COVERAGEINDEX: 0.4
     }
 };
 
