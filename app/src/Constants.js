@@ -8,8 +8,8 @@ const Constants = {
         WIDTH: 50,
         HEIGHT: 60,
         MINROOMSIDE: 5,
-        MAXROOMSIDE: 15,
-        COVERAGEINDEX: 0.4
+        MAXROOMSIDE: 10,
+        COVERAGEINDEX: 0.3
     }
 };
 
