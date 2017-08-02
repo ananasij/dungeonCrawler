@@ -1,8 +1,14 @@
 const Constants = {
+    GameState: {
+        GAME: 'GAME',
+        WIN: 'WIN',
+        LOSS: 'LOSS'
+    },
     CellState: {
         EMPTY: 'EMPTY',
         DUNGEON: 'DUNGEON',
-        HERO: 'HERO'
+        HERO: 'HERO',
+        ENEMY: 'ENEMY'
     },
     Map: {
         WIDTH: 50,
@@ -10,6 +16,9 @@ const Constants = {
         MINROOMSIDE: 5,
         MAXROOMSIDE: 10,
         COVERAGEINDEX: 0.3
+    },
+    ItemsDensity: {
+        ENEMIESDENSITY: 0.004
     }
 };
 

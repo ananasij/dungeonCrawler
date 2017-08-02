@@ -2,6 +2,7 @@ $cell-size: 15px;
 $color-cell-empty: black;
 $color-cell-dungeon: lightgray;
 $color-cell-hero: blue;
+$color-cell-enemy: red;
 
 .map {
   display: inline-block;
@@ -30,4 +31,7 @@ $color-cell-hero: blue;
 }
 .map-cell-hero {
   background-color: $color-cell-hero;
+}
+.map-cell-enemy {
+  background-color: $color-cell-enemy;
 }
