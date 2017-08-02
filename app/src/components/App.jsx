@@ -1,4 +1,5 @@
 import React from 'react';
+import update from 'immutability-helper';
 import GenerateDungeon from './GenerateDungeon';
 import Map from './Map';
 import Constants from './../Constants';
@@ -147,43 +148,51 @@ class App extends React.Component {
     }
 
     walk(nextX, nextY) {
-        const map = this.state.map;
-        const hero = this.state.hero;
-        map[hero.x][hero.y] = DUNGEON;
-        hero.x = nextX;
-        hero.y = nextY;
-        map[hero.x][hero.y] = HERO;
+        const x = this.state.hero.x;
+        const y = this.state.hero.y;
+        let map = this.state.map;
+        map = update(map, { [x]: { $splice: [[y, 1, DUNGEON]] } });
+        map = update(map, { [nextX]: { $splice: [[nextY, 1, HERO]] } });
+        const hero = update(this.state.hero, { $merge: {
+            x: nextX,
+            y: nextY
+        } });
         this.setState({ hero, map });
     }
 
     fight(nextX, nextY) {
-        const hero = this.state.hero;
+        let hero = this.state.hero;
         const enemyID = App.getItemID(nextX, nextY);
-        const enemy = this.state.enemies[enemyID];
+        let enemy = this.state.enemies[enemyID];
+
         console.log('FIGHT');
         console.log('Hero attacks: hero health ' + hero.health + ' hero damage ' + (hero.level * hero.weapon) + ' enemy health: ' + enemy.health);
-        console.log('hero hits ' + hero.hits + ' hero xp ' + hero.xp);
-        enemy.health -= hero.level * hero.weapon;
-        hero.hits += 1;
+
+        hero = update(hero, { $merge: { hits: this.state.hero.hits + 1 } });
+        enemy = update(enemy, { $merge: { health: enemy.health - (hero.level * hero.weapon) } });
+
         console.log('Hero attacked: enemy health: ' + enemy.health);
-        console.log('hero hits ' + hero.hits + ' hero xp ' + hero.xp);
+
         if (enemy.health > 0) {
             console.log('Enemy attacks:  hero health ' + hero.health + ' enemy damage ' + enemy.damage);
-            hero.health -= enemy.damage;
+            hero = update(hero, { $merge: { health: hero.health - enemy.damage } });
             console.log('Enemy attacked:  hero health ' + hero.health);
+
             if (hero.health <= 0) {
                 this.endGame(LOSS);
+            } else {
+                const enemies = update(this.state.enemies, { $merge: { [enemyID]: enemy } });
+                this.setState({ hero, enemies });
             }
         } else {
-            this.updateXp();
-            hero.hits = 0;
+            this.updateXp(hero);
             console.log('Win! hero xp ' + hero.xp);
             this.removeEnemy(enemyID);
         }
     }
 
-    updateXp() {
-        const hero = this.state.hero;
+    updateXp(heroToUpdate) {
+        const hero = heroToUpdate;
         const currentXp = XP_MIN + (XP_PER_HIT * hero.hits);
         hero.xp += currentXp;
         if (currentXp < hero.xpToNextLevel) {
@@ -192,14 +201,14 @@ class App extends React.Component {
             hero.level += 1;
             hero.xpToNextLevel = App.calculateXpToNextLevel(hero.level) - hero.xpToNextLevel;
         }
+        hero.hits = 0;
+        this.setState({ hero });
     }
 
     removeEnemy(enemyID) {
-        const enemies = this.state.enemies;
         const enemy = this.state.enemies[enemyID];
-        delete enemies[enemyID];
-        const map = this.state.map;
-        map[enemy.x][enemy.y] = DUNGEON;
+        const map = update(this.state.map, { [enemy.x]: { $splice: [[enemy.y, 1, DUNGEON]] } });
+        const enemies = update(this.state.enemies, { $unset: [enemyID] });
         this.setState({ enemies, map });
     }
 
