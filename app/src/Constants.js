@@ -18,7 +18,21 @@ const Constants = {
         COVERAGEINDEX: 0.3
     },
     ItemsDensity: {
-        ENEMIESDENSITY: 0.004
+        ENEMIESDENSITY: 0.005
+    },
+    Hero: {
+        H_INITIALHEALTH: 100
+    },
+    Enemy: {
+        E_MINHEALTH: 5,
+        E_HEALTHDEVIATION: 25,
+        E_MINDAMAGE: 10,
+        E_DAMAGEDEVIATION: 10
+    },
+    Xp: {
+        XP_MIN: 10,
+        XP_PER_HIT: 10,
+        LEVELUP_BASE: 50
     }
 };
 

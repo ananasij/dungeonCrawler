@@ -6,6 +6,9 @@ import Constants from './../Constants';
 const { EMPTY, DUNGEON, HERO, ENEMY } = Constants.CellState;
 const { ENEMIESDENSITY } = Constants.ItemsDensity;
 const { GAME, LOSS } = Constants.GameState;
+const { E_MINHEALTH, E_HEALTHDEVIATION, E_MINDAMAGE, E_DAMAGEDEVIATION } = Constants.Enemy;
+const { H_INITIALHEALTH } = Constants.Hero;
+const { XP_MIN, XP_PER_HIT, LEVELUP_BASE } = Constants.Xp;
 
 class App extends React.Component {
     static getRandomPoint(map) {
@@ -15,8 +18,16 @@ class App extends React.Component {
         return point;
     }
 
+    static getRandomValue(minValue, deviation) {
+        return minValue + Math.floor(Math.random() * deviation);
+    }
+
     static getItemID(x, y) {
         return ''.concat(x).concat('-').concat(y);
+    }
+
+    static calculateXpToNextLevel(currentLevel) {
+        return ((currentLevel + 1) ** 2) * LEVELUP_BASE;
     }
 
     constructor() {
@@ -54,10 +65,12 @@ class App extends React.Component {
         const hero = {
             x: 0,
             y: 0,
-            health: 50,
-            xp: 0,
+            health: H_INITIALHEALTH,
             weapon: 10,
-            level: 1
+            level: 1,
+            xp: 0,
+            xpToNextLevel: App.calculateXpToNextLevel(1),
+            hits: 0
         };
         let point;
         while (true) {
@@ -84,8 +97,8 @@ class App extends React.Component {
         while (enemiesCounter < enemiesLimit) {
             point = App.getRandomPoint(map);
             if (map[point.x][point.y] === DUNGEON) {
-                health = 20;
-                damage = 10;
+                health = App.getRandomValue(E_MINHEALTH, E_HEALTHDEVIATION);
+                damage = App.getRandomValue(E_MINDAMAGE, E_DAMAGEDEVIATION);
                 x = point.x;
                 y = point.y;
                 id = App.getItemID(x, y);
@@ -149,8 +162,11 @@ class App extends React.Component {
         const enemy = this.state.enemies[enemyID];
         console.log('FIGHT');
         console.log('Hero attacks: hero health ' + hero.health + ' hero damage ' + (hero.level * hero.weapon) + ' enemy health: ' + enemy.health);
+        console.log('hero hits ' + hero.hits + ' hero xp ' + hero.xp);
         enemy.health -= hero.level * hero.weapon;
+        hero.hits += 1;
         console.log('Hero attacked: enemy health: ' + enemy.health);
+        console.log('hero hits ' + hero.hits + ' hero xp ' + hero.xp);
         if (enemy.health > 0) {
             console.log('Enemy attacks:  hero health ' + hero.health + ' enemy damage ' + enemy.damage);
             hero.health -= enemy.damage;
@@ -159,7 +175,22 @@ class App extends React.Component {
                 this.endGame(LOSS);
             }
         } else {
+            this.updateXp();
+            hero.hits = 0;
+            console.log('Win! hero xp ' + hero.xp);
             this.removeEnemy(enemyID);
+        }
+    }
+
+    updateXp() {
+        const hero = this.state.hero;
+        const currentXp = XP_MIN + (XP_PER_HIT * hero.hits);
+        hero.xp += currentXp;
+        if (currentXp < hero.xpToNextLevel) {
+            hero.xpToNextLevel -= currentXp;
+        } else {
+            hero.level += 1;
+            hero.xpToNextLevel = App.calculateXpToNextLevel(hero.level) - hero.xpToNextLevel;
         }
     }
 
