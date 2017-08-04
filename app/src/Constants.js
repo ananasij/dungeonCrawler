@@ -8,7 +8,8 @@ const Constants = {
         EMPTY: 'EMPTY',
         DUNGEON: 'DUNGEON',
         HERO: 'HERO',
-        ENEMY: 'ENEMY'
+        ENEMY: 'ENEMY',
+        HEALTHPOINT: 'HEALTHPOINT'
     },
     Map: {
         WIDTH: 50,
@@ -18,7 +19,8 @@ const Constants = {
         COVERAGEINDEX: 0.3
     },
     ItemsDensity: {
-        ENEMIESDENSITY: 0.005
+        ENEMIESDENSITY: 0.004,
+        HEALTHPOINTSDENSITY: 0.002
     },
     Hero: {
         H_INITIALHEALTH: 100
@@ -28,6 +30,10 @@ const Constants = {
         E_HEALTHDEVIATION: 25,
         E_MINDAMAGE: 10,
         E_DAMAGEDEVIATION: 10
+    },
+    HealthPoints: {
+        HP_MINHEALTH: 10,
+        HP_HEALTHDEVIATION: 10
     },
     Xp: {
         XP_MIN: 10,

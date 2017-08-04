@@ -4,10 +4,11 @@ import GenerateDungeon from './GenerateDungeon';
 import Map from './Map';
 import Constants from './../Constants';
 
-const { EMPTY, DUNGEON, HERO, ENEMY } = Constants.CellState;
-const { ENEMIESDENSITY } = Constants.ItemsDensity;
+const { EMPTY, DUNGEON, HERO, ENEMY, HEALTHPOINT } = Constants.CellState;
+const { ENEMIESDENSITY, HEALTHPOINTSDENSITY } = Constants.ItemsDensity;
 const { GAME, LOSS } = Constants.GameState;
 const { E_MINHEALTH, E_HEALTHDEVIATION, E_MINDAMAGE, E_DAMAGEDEVIATION } = Constants.Enemy;
+const { HP_MINHEALTH, HP_HEALTHDEVIATION } = Constants.HealthPoints;
 const { H_INITIALHEALTH } = Constants.Hero;
 const { XP_MIN, XP_PER_HIT, LEVELUP_BASE } = Constants.Xp;
 
@@ -27,6 +28,18 @@ class App extends React.Component {
         return ''.concat(x).concat('-').concat(y);
     }
 
+    static placeItems(map, items, cellValue) {
+        let filledMap = map;
+        let x;
+        let y;
+        Object.keys(items).forEach((key) => {
+            x = items[key].x;
+            y = items[key].y;
+            filledMap = update(filledMap, { [x]: { $splice: [[y, 1, cellValue]] } });
+        });
+        return filledMap;
+    }
+
     static calculateXpToNextLevel(currentLevel) {
         return ((currentLevel + 1) ** 2) * LEVELUP_BASE;
     }
@@ -38,7 +51,8 @@ class App extends React.Component {
             dungeonHeight: 8,
             map: [],
             hero: {},
-            enemies: {}
+            enemies: {},
+            healthPoints: {}
         };
 
         this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -52,14 +66,14 @@ class App extends React.Component {
     initGame() {
         const width = Constants.Map.WIDTH;
         const height = Constants.Map.HEIGHT;
-        const map = GenerateDungeon(width, height);
+        let map = GenerateDungeon(width, height);
         const hero = this.initHero(map);
-        map[hero.x][hero.y] = HERO;
+        map = App.placeItems(map, { hero }, HERO);
         const enemies = this.initEnemies(map);
-        Object.keys(enemies).forEach((key) => {
-            map[enemies[key].x][enemies[key].y] = ENEMY;
-        });
-        this.setState({ gameState: GAME, width, height, map, hero, enemies });
+        map = App.placeItems(map, enemies, ENEMY);
+        const healthPoints = this.initHealthPoints(map);
+        map = App.placeItems(map, healthPoints, HEALTHPOINT);
+        this.setState({ gameState: GAME, width, height, map, hero, enemies, healthPoints });
     }
 
     initHero(map) {
@@ -110,6 +124,29 @@ class App extends React.Component {
         return enemies;
     }
 
+    initHealthPoints(map) {
+        const healthPoints = {};
+        const healthPointsLimit = (map.length * map[0].length) * HEALTHPOINTSDENSITY;
+        let healthPointsCounter = 0;
+        let x;
+        let y;
+        let health;
+        let point = { x: null, y: null };
+        let id;
+        while (healthPointsCounter < healthPointsLimit) {
+            point = App.getRandomPoint(map);
+            if (map[point.x][point.y] === DUNGEON) {
+                health = App.getRandomValue(HP_MINHEALTH, HP_HEALTHDEVIATION);
+                x = point.x;
+                y = point.y;
+                id = App.getItemID(x, y);
+                healthPoints[id] = { x, y, health };
+                healthPointsCounter += 1;
+            }
+        }
+        return healthPoints;
+    }
+
     handleKeyDown(e) {
         switch (e.code) {
         case 'ArrowUp':
@@ -140,6 +177,9 @@ class App extends React.Component {
         case ENEMY:
             this.fight(nextX, nextY);
             break;
+        case HEALTHPOINT:
+            this.pickHealth(nextX, nextY);
+            break;
         case EMPTY:
             break;
         default:
@@ -168,7 +208,7 @@ class App extends React.Component {
         console.log('FIGHT');
         console.log('Hero attacks: hero health ' + hero.health + ' hero damage ' + (hero.level * hero.weapon) + ' enemy health: ' + enemy.health);
 
-        hero = update(hero, { $merge: { hits: this.state.hero.hits + 1 } });
+        hero = update(hero, { $merge: { hits: hero.hits + 1 } });
         enemy = update(enemy, { $merge: { health: enemy.health - (hero.level * hero.weapon) } });
 
         console.log('Hero attacked: enemy health: ' + enemy.health);
@@ -187,7 +227,7 @@ class App extends React.Component {
         } else {
             this.updateXp(hero);
             console.log('Win! hero xp ' + hero.xp);
-            this.removeEnemy(enemyID);
+            this.removeItem(enemyID, 'enemies');
         }
     }
 
@@ -205,11 +245,22 @@ class App extends React.Component {
         this.setState({ hero });
     }
 
-    removeEnemy(enemyID) {
-        const enemy = this.state.enemies[enemyID];
-        const map = update(this.state.map, { [enemy.x]: { $splice: [[enemy.y, 1, DUNGEON]] } });
-        const enemies = update(this.state.enemies, { $unset: [enemyID] });
-        this.setState({ enemies, map });
+    removeItem(itemID, targetName) {
+        let target = this.state[targetName];
+        const item = target[itemID];
+        const map = update(this.state.map, { [item.x]: { $splice: [[item.y, 1, DUNGEON]] } });
+        target = update(target, { $unset: [itemID] });
+        this.setState({ [targetName]: target, map });
+    }
+
+    pickHealth(nextX, nextY) {
+        let hero = this.state.hero;
+        const healthPointID = App.getItemID(nextX, nextY);
+        const healthPoint = this.state.healthPoints[healthPointID];
+        hero = update(hero, { $merge: { health: hero.health + healthPoint.health } });
+        console.log('Health top-up: +' + healthPoint.health + ', current health ' + hero.health);
+        this.removeItem(healthPointID, 'healthPoints');
+        this.setState({ hero });
     }
 
     endGame(gameState) {

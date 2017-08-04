@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Constants from './../Constants';
 
-const { EMPTY, DUNGEON, HERO, ENEMY } = Constants.CellState;
+const { EMPTY, DUNGEON, HERO, ENEMY, HEALTHPOINT } = Constants.CellState;
 
 function Grid({ map }) {
     const width = map.length;
@@ -27,6 +27,9 @@ function Grid({ map }) {
                 break;
             case ENEMY:
                 currentCellStyle = 'map-cell-enemy';
+                break;
+            case HEALTHPOINT:
+                currentCellStyle = 'map-cell-healthpoint';
                 break;
             default:
                 break;
