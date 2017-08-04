@@ -4,7 +4,11 @@ import Constants from './../Constants';
 
 const { EMPTY, DUNGEON, HERO, ENEMY, HEALTHPOINT } = Constants.CellState;
 
-function Grid({ map }) {
+function getItemID(x, y) {
+    return ''.concat(x).concat('-').concat(y);
+}
+
+function Grid({ map, visibilityArea }) {
     const width = map.length;
     const height = map[0].length;
 
@@ -15,25 +19,30 @@ function Grid({ map }) {
     for (let y = 0; y < height; y += 1) {
         currentRow = [];
         for (let x = 0; x < width; x += 1) {
-            switch (map[x][y]) {
-            case EMPTY:
+            if (visibilityArea.indexOf(getItemID(x, y)) === -1) {
                 currentCellStyle = 'map-cell-empty';
-                break;
-            case DUNGEON:
-                currentCellStyle = 'map-cell-dungeon';
-                break;
-            case HERO:
-                currentCellStyle = 'map-cell-hero';
-                break;
-            case ENEMY:
-                currentCellStyle = 'map-cell-enemy';
-                break;
-            case HEALTHPOINT:
-                currentCellStyle = 'map-cell-healthpoint';
-                break;
-            default:
-                break;
+            } else {
+                switch (map[x][y]) {
+                case EMPTY:
+                    currentCellStyle = 'map-cell-empty';
+                    break;
+                case DUNGEON:
+                    currentCellStyle = 'map-cell-dungeon';
+                    break;
+                case HERO:
+                    currentCellStyle = 'map-cell-hero';
+                    break;
+                case ENEMY:
+                    currentCellStyle = 'map-cell-enemy';
+                    break;
+                case HEALTHPOINT:
+                    currentCellStyle = 'map-cell-healthpoint';
+                    break;
+                default:
+                    break;
+                }
             }
+
 
             if (!map[x][y]) {
                 throw new Error(`Undefined cell: ${x}, ${y}`);
@@ -57,7 +66,8 @@ function Grid({ map }) {
 }
 
 Grid.propTypes = {
-    map: PropTypes.array.isRequired
+    map: PropTypes.array.isRequired,
+    visibilityArea: PropTypes.array.isRequired
 };
 
 export default Grid;

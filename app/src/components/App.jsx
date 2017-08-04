@@ -5,6 +5,7 @@ import Map from './Map';
 import Constants from './../Constants';
 
 const { EMPTY, DUNGEON, HERO, ENEMY, HEALTHPOINT } = Constants.CellState;
+const { LIMITED, VISIBILITYRADIUS } = Constants.Visibility;
 const { ENEMIESDENSITY, HEALTHPOINTSDENSITY } = Constants.ItemsDensity;
 const { GAME, LOSS } = Constants.GameState;
 const { E_MINHEALTH, E_HEALTHDEVIATION, E_MINDAMAGE, E_DAMAGEDEVIATION } = Constants.Enemy;
@@ -49,6 +50,7 @@ class App extends React.Component {
         this.state = {
             dungeonWidth: 10,
             dungeonHeight: 8,
+            visibility: LIMITED,
             map: [],
             hero: {},
             enemies: {},
@@ -268,11 +270,44 @@ class App extends React.Component {
         this.setState({ gameState });
     }
 
+    setVisibilityArea() {
+        const visibilityArea = [];
+        const maxRowSize = (VISIBILITYRADIUS * 2) + 1;
+        const minRowSize = VISIBILITYRADIUS % 2 ? VISIBILITYRADIUS : VISIBILITYRADIUS - 1;
+        const startX = this.state.hero.x - minRowSize;
+        const startY = this.state.hero.y - minRowSize;
+        let currentRowSize = minRowSize;
+        let rowsWithMaxSizeCount = 0;
+        let rowSizeModifier = 2;
+        let rowStart;
+
+        for (let i = 0; i < maxRowSize; i += 1) {
+            rowStart = (maxRowSize - currentRowSize) / 2;
+
+            for (let j = rowStart; j < rowStart + currentRowSize; j += 1) {
+                visibilityArea.push(App.getItemID(startX + i, startY + j));
+            }
+
+            if (currentRowSize === maxRowSize) {
+                rowsWithMaxSizeCount += 1;
+                if (rowsWithMaxSizeCount === minRowSize) {
+                    rowSizeModifier *= -1;
+                    currentRowSize += rowSizeModifier;
+                }
+            } else {
+                currentRowSize += rowSizeModifier;
+            }
+        }
+        return visibilityArea;
+    }
+
     render() {
         if (this.state.gameState === GAME) {
+            const visibilityArea = this.setVisibilityArea();
             return (
                 <Map
                     map={this.state.map}
+                    visibilityArea={visibilityArea}
                 />
             );
         } else if (this.state.gameState === LOSS) {

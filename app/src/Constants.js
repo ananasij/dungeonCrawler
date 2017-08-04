@@ -4,6 +4,11 @@ const Constants = {
         WIN: 'WIN',
         LOSS: 'LOSS'
     },
+    Visibility: {
+        FULL: 'FULL',
+        LIMITED: 'LIMITED',
+        VISIBILITYRADIUS: 6
+    },
     CellState: {
         EMPTY: 'EMPTY',
         DUNGEON: 'DUNGEON',
