@@ -2,12 +2,13 @@ import React from 'react';
 import update from 'immutability-helper';
 import GenerateDungeon from './GenerateDungeon';
 import Map from './Map';
+import GameInfoBar from './GameInfoBar.jsx';
 import Constants from './../Constants';
 
 const { EMPTY, DUNGEON, HERO, ENEMY, HEALTHPOINT } = Constants.CellState;
-const { LIMITED, VISIBILITYRADIUS } = Constants.Visibility;
+const { FULL, LIMITED, VISIBILITYRADIUS } = Constants.Visibility;
 const { ENEMIESDENSITY, HEALTHPOINTSDENSITY } = Constants.ItemsDensity;
-const { GAME, LOSS } = Constants.GameState;
+const { GAME, LOSS, WIN } = Constants.GameState;
 const { E_MINHEALTH, E_HEALTHDEVIATION, E_MINDAMAGE, E_DAMAGEDEVIATION } = Constants.Enemy;
 const { HP_MINHEALTH, HP_HEALTHDEVIATION } = Constants.HealthPoints;
 const { H_INITIALHEALTH } = Constants.Hero;
@@ -54,10 +55,15 @@ class App extends React.Component {
             map: [],
             hero: {},
             enemies: {},
-            healthPoints: {}
+            healthPoints: {},
+            gameInfo: {
+                enemiesLeft: null,
+                currentEnemy: null
+            }
         };
 
         this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.toggleVisibility = this.toggleVisibility.bind(this);
     }
 
     componentWillMount() {
@@ -75,7 +81,11 @@ class App extends React.Component {
         map = App.placeItems(map, enemies, ENEMY);
         const healthPoints = this.initHealthPoints(map);
         map = App.placeItems(map, healthPoints, HEALTHPOINT);
-        this.setState({ gameState: GAME, width, height, map, hero, enemies, healthPoints });
+        const gameInfo = update(this.state.gameInfo, {
+            $merge: { enemiesLeft: Object.keys(enemies).length }
+        });
+        const gameState = GAME;
+        this.setState({ width, height, map, hero, enemies, healthPoints, gameInfo, gameState });
     }
 
     initHero(map) {
@@ -199,27 +209,21 @@ class App extends React.Component {
             x: nextX,
             y: nextY
         } });
-        this.setState({ hero, map });
+        const gameInfo = update(this.state.gameInfo, { $merge: { currentEnemy: null } });
+        this.setState({ hero, map, gameInfo });
     }
 
     fight(nextX, nextY) {
+        let gameInfo = this.state.gameInfo;
         let hero = this.state.hero;
         const enemyID = App.getItemID(nextX, nextY);
         let enemy = this.state.enemies[enemyID];
 
-        console.log('FIGHT');
-        console.log('Hero attacks: hero health ' + hero.health + ' hero damage ' + (hero.level * hero.weapon) + ' enemy health: ' + enemy.health);
-
         hero = update(hero, { $merge: { hits: hero.hits + 1 } });
         enemy = update(enemy, { $merge: { health: enemy.health - (hero.level * hero.weapon) } });
 
-        console.log('Hero attacked: enemy health: ' + enemy.health);
-
         if (enemy.health > 0) {
-            console.log('Enemy attacks:  hero health ' + hero.health + ' enemy damage ' + enemy.damage);
             hero = update(hero, { $merge: { health: hero.health - enemy.damage } });
-            console.log('Enemy attacked:  hero health ' + hero.health);
-
             if (hero.health <= 0) {
                 this.endGame(LOSS);
             } else {
@@ -228,9 +232,15 @@ class App extends React.Component {
             }
         } else {
             this.updateXp(hero);
-            console.log('Win! hero xp ' + hero.xp);
             this.removeItem(enemyID, 'enemies');
+            enemy = update(enemy, { $merge: { health: 0 } });
+            gameInfo = update(gameInfo, { $merge: { enemiesLeft: gameInfo.enemiesLeft - 1 } });
+            if (gameInfo.enemiesLeft === 0) {
+                this.endGame(WIN);
+            }
         }
+        gameInfo = update(gameInfo, { $merge: { currentEnemy: enemy } });
+        this.setState({ gameInfo });
     }
 
     updateXp(heroToUpdate) {
@@ -260,7 +270,6 @@ class App extends React.Component {
         const healthPointID = App.getItemID(nextX, nextY);
         const healthPoint = this.state.healthPoints[healthPointID];
         hero = update(hero, { $merge: { health: hero.health + healthPoint.health } });
-        console.log('Health top-up: +' + healthPoint.health + ', current health ' + hero.health);
         this.removeItem(healthPointID, 'healthPoints');
         this.setState({ hero });
     }
@@ -301,19 +310,37 @@ class App extends React.Component {
         return visibilityArea;
     }
 
+    toggleVisibility() {
+        const visibility = this.state.visibility === FULL ? LIMITED : FULL;
+        this.setState({ visibility });
+    }
+
     render() {
         if (this.state.gameState === GAME) {
-            const visibilityArea = this.setVisibilityArea();
+            const visibilityArea = this.state.visibility === FULL ? null : this.setVisibilityArea();
             return (
-                <Map
-                    map={this.state.map}
-                    visibilityArea={visibilityArea}
-                />
+                <div>
+                    <Map
+                        map={this.state.map}
+                        visibilityArea={visibilityArea}
+                    />
+                    <GameInfoBar
+                        hero={this.state.hero}
+                        gameInfo={this.state.gameInfo}
+                        onVisibilitySwitch={this.toggleVisibility}
+                    />
+                </div>
             );
         } else if (this.state.gameState === LOSS) {
             return (
                 <div>
                     WASTED
+                </div>
+            );
+        } else if (this.state.gameState === WIN) {
+            return (
+                <div>
+                    HERE IS THE WINNER
                 </div>
             );
         }

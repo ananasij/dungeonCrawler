@@ -19,7 +19,7 @@ function Grid({ map, visibilityArea }) {
     for (let y = 0; y < height; y += 1) {
         currentRow = [];
         for (let x = 0; x < width; x += 1) {
-            if (visibilityArea.indexOf(getItemID(x, y)) === -1) {
+            if (visibilityArea && visibilityArea.indexOf(getItemID(x, y)) === -1) {
                 currentCellStyle = 'map-cell-empty';
             } else {
                 switch (map[x][y]) {
@@ -67,7 +67,11 @@ function Grid({ map, visibilityArea }) {
 
 Grid.propTypes = {
     map: PropTypes.array.isRequired,
-    visibilityArea: PropTypes.array.isRequired
+    visibilityArea: PropTypes.array
+};
+
+Grid.defaultProps = {
+    visibilityArea: null
 };
 
 export default Grid;
