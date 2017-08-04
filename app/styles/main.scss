@@ -1,10 +1,58 @@
+@import url('https://fonts.googleapis.com/css?family=Press+Start+2P');
+@import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono');
+
 $cell-size: 15px;
-$color-cell-empty: black;
+$color-page: black;
+$color-text: white;
+$color-cell-invisible: black;
+$color-cell-empty: gray;
 $color-cell-dungeon: lightgray;
 $color-cell-hero: blue;
 $color-cell-enemy: red;
 $color-cell-healthpoint: green;
 
+$font-title: 'Press Start 2P', cursive;
+$font-text: 'Share Tech Mono', monospace;
+
+body {
+  background-color: $color-page;
+  color: $color-text;
+  font-family: $font-text;
+}
+
+h1, h2, h3 {
+  font-family: $font-title;
+  text-align: center;
+}
+.game-container {
+  width: 90%;
+  margin: 20px auto;
+}
+
+.game-info {
+  border: 1px double white;
+  margin: auto;
+}
+.info-row {
+  padding: 5px 0;
+}
+.info-group {
+  display: inline-block;
+  margin: 0;
+}
+.info-item {
+  display: inline-block;
+  padding: auto 10px;
+  &.info-item-s {
+    width: 150px
+  }
+  &.info-item-l {
+    width: 300px;
+  }
+}
+.game-board {
+  text-align: center;
+}
 .map {
   display: inline-block;
 }
@@ -24,6 +72,9 @@ $color-cell-healthpoint: green;
   border: 0;
 }
 
+.map-cell-invisible {
+  background-color: $color-cell-invisible;
+}
 .map-cell-empty {
   background-color: $color-cell-empty;
 }
@@ -38,4 +89,10 @@ $color-cell-healthpoint: green;
 }
 .map-cell-healthpoint {
   background-color: $color-cell-healthpoint;
+}
+
+.btn {
+  font-family: $font-title;
+  margin: 5px;
+  padding: 5px;
 }

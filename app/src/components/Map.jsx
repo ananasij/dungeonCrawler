@@ -20,7 +20,7 @@ function Grid({ map, visibilityArea }) {
         currentRow = [];
         for (let x = 0; x < width; x += 1) {
             if (visibilityArea && visibilityArea.indexOf(getItemID(x, y)) === -1) {
-                currentCellStyle = 'map-cell-empty';
+                currentCellStyle = 'map-cell-invisible';
             } else {
                 switch (map[x][y]) {
                 case EMPTY:

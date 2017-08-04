@@ -12,27 +12,45 @@ function StatsBar({ hero, gameInfo, onVisibilitySwitch }) {
     let currentEnemyInfo = null;
     if (gameInfo.currentEnemy) {
         currentEnemyInfo = (
-            <div>
-                Current enemy: Health: {gameInfo.currentEnemy.health} Damage: {gameInfo.currentEnemy.damage}
+            <div className="info-group">
+                <span className="info-item info-item-s">
+                    Current enemy:
+                </span>
+                <span className="info-item info-item-s">
+                    Health: {gameInfo.currentEnemy.health}
+                </span>
+                <span className="info-item info-item-s">
+                    Damage: {gameInfo.currentEnemy.damage}
+                </span>
             </div>
         );
     }
     return (
         <div>
-            <div>
-                Health: {hero.health}<br />
-                Level: {hero.level}<br />
-                XP to next level: {hero.xpToNextLevel}<br />
-                XP: {hero.xp}
+            <div className="info-row">
+                <span className="info-item info-item-s">
+                    Health: {hero.health}
+                </span>
+                <span className="info-item info-item-s">
+                    Level: {hero.level}
+                </span>
+                <span className="info-item info-item-s">
+                    XP: {hero.xp}
+                </span>
+                <span className="info-item info-item-l">
+                    XP to next level: {hero.xpToNextLevel}
+                </span>
             </div>
-            <div>
-                Enemies left: {gameInfo.enemiesLeft}
-            </div>
-            <div>
+            <div className="info-row">
+                <span className="info-item info-item-l">
+                    Enemies left: {gameInfo.enemiesLeft}
+                </span>
                 {currentEnemyInfo}
             </div>
             <div>
-                <button onClick={onVisibilitySwitch}>Toggle visibility</button>
+                <button className="btn" onClick={onVisibilitySwitch}>
+                    Toggle visibility
+                </button>
             </div>
         </div>
     );

@@ -316,35 +316,43 @@ class App extends React.Component {
     }
 
     render() {
+        let gameBoard;
         if (this.state.gameState === GAME) {
             const visibilityArea = this.state.visibility === FULL ? null : this.setVisibilityArea();
-            return (
-                <div>
-                    <Map
-                        map={this.state.map}
-                        visibilityArea={visibilityArea}
-                    />
-                    <GameInfoBar
-                        hero={this.state.hero}
-                        gameInfo={this.state.gameInfo}
-                        onVisibilitySwitch={this.toggleVisibility}
-                    />
-                </div>
+            gameBoard = (
+                <Map
+                    map={this.state.map}
+                    visibilityArea={visibilityArea}
+                />
             );
         } else if (this.state.gameState === LOSS) {
-            return (
-                <div>
+            gameBoard = (
+                <h1>
                     WASTED
-                </div>
+                </h1>
             );
         } else if (this.state.gameState === WIN) {
-            return (
-                <div>
-                    HERE IS THE WINNER
-                </div>
+            gameBoard = (
+                <h1>
+                    YOU WON
+                </h1>
             );
         }
-        return null;
+        return (
+            <div className="game-container">
+                <h1>Dungeon crawler game</h1>
+                <h3>Kill all enemies in the dungeon to win</h3>
+                <GameInfoBar
+                    className="game-info"
+                    hero={this.state.hero}
+                    gameInfo={this.state.gameInfo}
+                    onVisibilitySwitch={this.toggleVisibility}
+                />
+                <div className="game-board">
+                    {gameBoard}
+                </div>
+            </div>
+        );
     }
 }
 
