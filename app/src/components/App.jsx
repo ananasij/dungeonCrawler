@@ -283,8 +283,8 @@ class App extends React.Component {
         const visibilityArea = [];
         const maxRowSize = (VISIBILITYRADIUS * 2) + 1;
         const minRowSize = VISIBILITYRADIUS % 2 ? VISIBILITYRADIUS : VISIBILITYRADIUS - 1;
-        const startX = this.state.hero.x - minRowSize;
-        const startY = this.state.hero.y - minRowSize;
+        const startX = this.state.hero.x - VISIBILITYRADIUS;
+        const startY = this.state.hero.y - VISIBILITYRADIUS;
         let currentRowSize = minRowSize;
         let rowsWithMaxSizeCount = 0;
         let rowSizeModifier = 2;
@@ -342,12 +342,13 @@ class App extends React.Component {
             <div className="game-container">
                 <h1>Dungeon crawler game</h1>
                 <h3>Kill all enemies in the dungeon to win</h3>
-                <GameInfoBar
-                    className="game-info"
-                    hero={this.state.hero}
-                    gameInfo={this.state.gameInfo}
-                    onVisibilitySwitch={this.toggleVisibility}
-                />
+                <div className="game-info">
+                    <GameInfoBar
+                        hero={this.state.hero}
+                        gameInfo={this.state.gameInfo}
+                        onVisibilitySwitch={this.toggleVisibility}
+                    />
+                </div>
                 <div className="game-board">
                     {gameBoard}
                 </div>

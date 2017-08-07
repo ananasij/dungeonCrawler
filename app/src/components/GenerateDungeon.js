@@ -4,6 +4,8 @@ import Constants from './../Constants';
 const { EMPTY, DUNGEON } = Constants.CellState;
 const { MAXROOMSIDE, MINROOMSIDE, COVERAGEINDEX } = Constants.Map;
 
+const roomConnections = {};
+
 function generateRandomRoom(map) {
     const mapWidth = map.length;
     const mapHeight = map[0].length;
@@ -42,56 +44,16 @@ function countRoomsRatio(rooms, map) {
     return roomsArea / mapArea;
 }
 
-function sideIsConnected(side, map) {
-    for (let x = side.startX; x <= side.endX; x += 1) {
-        for (let y = side.startY; y <= side.endY; y += 1) {
-            if (map[x][y] === DUNGEON) {
-                return true;
-            }
-        }
-    }
-    return false;
+function roomIsConnected(room) {
+    return (Object.keys(roomConnections).indexOf(''.concat(room)) !== -1 && roomConnections[room] > 1);
 }
 
-function roomIsConnected(room, map) {
-    let connectionCounter = 0;
-    const leftSide = {
-        startX: room.startX - 1,
-        endX: room.startX - 1,
-        startY: room.startY,
-        endY: room.startY + room.height
-    };
-    const rightSide = {
-        startX: room.startX + room.width,
-        endX: room.startX + room.width,
-        startY: room.startY,
-        endY: room.startY + room.height
-    };
-    const topSide = {
-        startX: room.startX,
-        endX: room.startX + room.width,
-        startY: room.startY - 1,
-        endY: room.startY - 1
-    };
-    const bottomSide = {
-        startX: room.startX,
-        endX: room.startX + room.width,
-        startY: room.startY + room.height,
-        endY: room.startY + room.height
-    };
-    if (sideIsConnected(leftSide, map)) {
-        connectionCounter += 1;
+function saveConnection(roomIndex) {
+    if (Object.keys(roomConnections).indexOf(''.concat(roomIndex)) === -1) {
+        roomConnections[roomIndex] = 1;
+    } else {
+        roomConnections[roomIndex] += 1;
     }
-    if (sideIsConnected(rightSide, map)) {
-        connectionCounter += 1;
-    }
-    if (sideIsConnected(topSide, map)) {
-        connectionCounter += 1;
-    }
-    if (sideIsConnected(bottomSide, map)) {
-        connectionCounter += 1;
-    }
-    return (connectionCounter > 2);
 }
 
 function findRoomCenter(room) {
@@ -100,13 +62,14 @@ function findRoomCenter(room) {
     return { x, y };
 }
 
-function makePassage(rooms, currentRoomIndex, map) {
+function makePassage(rooms, currentRoomIndex) {
     const room1 = rooms[currentRoomIndex];
     let room2 = null;
     while (!room2) {
         const i = Math.floor(Math.random() * rooms.length);
-        if (i !== currentRoomIndex && !roomIsConnected(rooms[i], map)) {
+        if (i !== currentRoomIndex && !roomIsConnected(i)) {
             room2 = rooms[i];
+            saveConnection(i);
         }
     }
     const room1Center = findRoomCenter(room1);
@@ -155,8 +118,8 @@ function GenerateDungeon(width, height) {
     }
 
     for (let i = 0; i < rooms.length; i += 1) {
-        if (!roomIsConnected(rooms[i], map)) {
-            const passage = makePassage(rooms, i, map);
+        if (!roomIsConnected(i)) {
+            const passage = makePassage(rooms, i);
             placePassageArm(passage.horizontalArm);
             placePassageArm(passage.verticalArm);
         }
