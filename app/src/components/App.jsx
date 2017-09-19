@@ -6,12 +6,12 @@ import GameInfoBar from './GameInfoBar.jsx';
 import Constants from './../Constants';
 
 const { EMPTY, DUNGEON, HERO, ENEMY, HEALTHPOINT } = Constants.CellState;
-const { FULL, LIMITED, VISIBILITYRADIUS } = Constants.Visibility;
-const { ENEMIESDENSITY, HEALTHPOINTSDENSITY } = Constants.ItemsDensity;
+const { FULL, LIMITED, VISIBILITY_RADIUS } = Constants.Visibility;
+const { ENEMIES_DENSITY, HEALTHPOINTS_DENSITY } = Constants.ItemsDensity;
 const { LOADING, GAME, LOSS, WIN } = Constants.GameState;
-const { E_MINHEALTH, E_HEALTHDEVIATION, E_MINDAMAGE, E_DAMAGEDEVIATION } = Constants.Enemy;
-const { HP_MINHEALTH, HP_HEALTHDEVIATION } = Constants.HealthPoints;
-const { H_INITIALHEALTH } = Constants.Hero;
+const { E_MIN_HEALTH, E_HEALTH_DEVIATION, E_MIN_DAMAGE, E_DAMAGE_DEVIATION } = Constants.Enemy;
+const { HP_MIN_HEALTH, HP_HEALTH_DEVIATION } = Constants.HealthPoints;
+const { H_INITIAL_HEALTH } = Constants.Hero;
 const { XP_MIN, XP_PER_HIT, LEVELUP_BASE } = Constants.Xp;
 
 class App extends React.Component {
@@ -107,7 +107,7 @@ class App extends React.Component {
         const hero = {
             x: 0,
             y: 0,
-            health: H_INITIALHEALTH,
+            health: H_INITIAL_HEALTH,
             weapon: 10,
             level: 1,
             xp: 0,
@@ -128,7 +128,7 @@ class App extends React.Component {
 
     initEnemies(map) {
         const enemies = {};
-        const enemiesLimit = (map.length * map[0].length) * ENEMIESDENSITY;
+        const enemiesLimit = (map.length * map[0].length) * ENEMIES_DENSITY;
         let enemiesCounter = 0;
         let x;
         let y;
@@ -139,8 +139,8 @@ class App extends React.Component {
         while (enemiesCounter < enemiesLimit) {
             point = App.getRandomPoint(map);
             if (map[point.x][point.y] === DUNGEON) {
-                health = App.getRandomValue(E_MINHEALTH, E_HEALTHDEVIATION);
-                damage = App.getRandomValue(E_MINDAMAGE, E_DAMAGEDEVIATION);
+                health = App.getRandomValue(E_MIN_HEALTH, E_HEALTH_DEVIATION);
+                damage = App.getRandomValue(E_MIN_DAMAGE, E_DAMAGE_DEVIATION);
                 x = point.x;
                 y = point.y;
                 id = App.getItemID(x, y);
@@ -153,7 +153,7 @@ class App extends React.Component {
 
     initHealthPoints(map) {
         const healthPoints = {};
-        const healthPointsLimit = (map.length * map[0].length) * HEALTHPOINTSDENSITY;
+        const healthPointsLimit = (map.length * map[0].length) * HEALTHPOINTS_DENSITY;
         let healthPointsCounter = 0;
         let x;
         let y;
@@ -163,7 +163,7 @@ class App extends React.Component {
         while (healthPointsCounter < healthPointsLimit) {
             point = App.getRandomPoint(map);
             if (map[point.x][point.y] === DUNGEON) {
-                health = App.getRandomValue(HP_MINHEALTH, HP_HEALTHDEVIATION);
+                health = App.getRandomValue(HP_MIN_HEALTH, HP_HEALTH_DEVIATION);
                 x = point.x;
                 y = point.y;
                 id = App.getItemID(x, y);
@@ -296,10 +296,10 @@ class App extends React.Component {
 
     setVisibilityArea() {
         const visibilityArea = [];
-        const maxRowSize = (VISIBILITYRADIUS * 2) + 1;
-        const minRowSize = VISIBILITYRADIUS % 2 ? VISIBILITYRADIUS : VISIBILITYRADIUS - 1;
-        const startX = this.state.hero.x - VISIBILITYRADIUS;
-        const startY = this.state.hero.y - VISIBILITYRADIUS;
+        const maxRowSize = (VISIBILITY_RADIUS * 2) + 1;
+        const minRowSize = VISIBILITY_RADIUS % 2 ? VISIBILITY_RADIUS : VISIBILITY_RADIUS - 1;
+        const startX = this.state.hero.x - VISIBILITY_RADIUS;
+        const startY = this.state.hero.y - VISIBILITY_RADIUS;
         let currentRowSize = minRowSize;
         let rowsWithMaxSizeCount = 0;
         let rowSizeModifier = 2;
@@ -376,8 +376,7 @@ class App extends React.Component {
                     className="game-board"
                     ref={(c) => { this.gameBoard = c; }}
                 >
-
-                {gameBoard}
+                    {gameBoard}
                 </div>
             </div>
         );

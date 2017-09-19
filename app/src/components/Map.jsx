@@ -19,7 +19,7 @@ function getStart(heroCoordinate, viewportSize, mapSize) {
     return heroCoordinate - offset;
 }
 
-function Grid({ hero, map, visibilityArea, windowSize }) {
+function Map({ hero, map, visibilityArea, windowSize }) {
     const mapWidth = map.length;
     const mapHeight = map[0].length;
     const mapToRender = [];
@@ -83,15 +83,15 @@ function Grid({ hero, map, visibilityArea, windowSize }) {
     );
 }
 
-Grid.propTypes = {
+Map.propTypes = {
     hero: PropTypes.object.isRequired,
     map: PropTypes.array.isRequired,
     visibilityArea: PropTypes.array,
     windowSize: PropTypes.object.isRequired
 };
 
-Grid.defaultProps = {
+Map.defaultProps = {
     visibilityArea: null
 };
 
-export default Grid;
+export default Map;

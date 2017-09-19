@@ -2,7 +2,7 @@ import React from 'react';
 import Constants from './../Constants';
 
 const { EMPTY, DUNGEON } = Constants.CellState;
-const { MAXROOMSIDE, MINROOMSIDE, COVERAGEINDEX } = Constants.Map;
+const { MAX_ROOM_SIDE, MIN_ROOM_SIDE, COVERAGE_INDEX } = Constants.Map;
 
 const roomConnections = {};
 
@@ -10,8 +10,8 @@ function generateRandomRoom(map) {
     const mapWidth = map.length;
     const mapHeight = map[0].length;
 
-    const roomWidth = MINROOMSIDE + Math.floor(Math.random() * (MAXROOMSIDE - MINROOMSIDE));
-    const roomHeight = MINROOMSIDE + Math.floor(Math.random() * (MAXROOMSIDE - MINROOMSIDE));
+    const roomWidth = MIN_ROOM_SIDE + Math.floor(Math.random() * (MAX_ROOM_SIDE - MIN_ROOM_SIDE));
+    const roomHeight = MIN_ROOM_SIDE + Math.floor(Math.random() * (MAX_ROOM_SIDE - MIN_ROOM_SIDE));
     const roomStartX = Math.floor(Math.random() * (mapWidth - roomWidth - 1)) + 1;
     const roomStartY = Math.floor(Math.random() * (mapHeight - roomHeight - 1)) + 1;
 
@@ -101,7 +101,7 @@ function GenerateDungeon(width, height) {
         }
     }
 
-    while (countRoomsRatio(rooms, map) < COVERAGEINDEX) {
+    while (countRoomsRatio(rooms, map) < COVERAGE_INDEX) {
         const newRoom = generateRandomRoom(map);
         if (!rooms.length || !roomIntersectsOthers(newRoom, rooms)) {
             rooms.push(newRoom);

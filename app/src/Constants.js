@@ -8,7 +8,7 @@ const Constants = {
     Visibility: {
         FULL: 'FULL',
         LIMITED: 'LIMITED',
-        VISIBILITYRADIUS: 6
+        VISIBILITY_RADIUS: 6
     },
     CellState: {
         EMPTY: 'EMPTY',
@@ -21,26 +21,26 @@ const Constants = {
         CELL_SIZE_PX: 15,
         WIDTH: 50,
         HEIGHT: 60,
-        MINROOMSIDE: 5,
-        MAXROOMSIDE: 10,
-        COVERAGEINDEX: 0.3
+        MIN_ROOM_SIDE: 5,
+        MAX_ROOM_SIDE: 10,
+        COVERAGE_INDEX: 0.3
     },
     ItemsDensity: {
-        ENEMIESDENSITY: 0.004,
-        HEALTHPOINTSDENSITY: 0.002
+        ENEMIES_DENSITY: 0.004,
+        HEALTHPOINTS_DENSITY: 0.002
     },
     Hero: {
-        H_INITIALHEALTH: 100
+        H_INITIAL_HEALTH: 100
     },
     Enemy: {
-        E_MINHEALTH: 5,
-        E_HEALTHDEVIATION: 25,
-        E_MINDAMAGE: 10,
-        E_DAMAGEDEVIATION: 10
+        E_MIN_HEALTH: 5,
+        E_HEALTH_DEVIATION: 25,
+        E_MIN_DAMAGE: 10,
+        E_DAMAGE_DEVIATION: 10
     },
     HealthPoints: {
-        HP_MINHEALTH: 10,
-        HP_HEALTHDEVIATION: 10
+        HP_MIN_HEALTH: 10,
+        HP_HEALTH_DEVIATION: 10
     },
     Xp: {
         XP_MIN: 10,
