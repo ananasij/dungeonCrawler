@@ -3,22 +3,41 @@ import PropTypes from 'prop-types';
 import Constants from './../Constants';
 
 const { EMPTY, DUNGEON, HERO, ENEMY, HEALTHPOINT } = Constants.CellState;
+const { CELL_SIZE_PX } = Constants.Map;
 
 function getItemID(x, y) {
     return ''.concat(x).concat('-').concat(y);
 }
 
-function Grid({ map, visibilityArea }) {
-    const width = map.length;
-    const height = map[0].length;
+function getStart(heroCoordinate, viewportSize, mapSize) {
+    const offset = Math.floor(viewportSize / 2);
+    if (viewportSize > mapSize || heroCoordinate - offset < 0) {
+        return 0;
+    } else if (heroCoordinate + offset > mapSize) {
+        return mapSize - viewportSize;
+    }
+    return heroCoordinate - offset;
+}
 
+function Grid({ hero, map, visibilityArea, windowSize }) {
+    const mapWidth = map.length;
+    const mapHeight = map[0].length;
     const mapToRender = [];
     let currentRow;
     let currentCellStyle;
 
-    for (let y = 0; y < height; y += 1) {
+    const viewportWidth = Math.floor(windowSize.width / CELL_SIZE_PX);
+    const viewportHeight = Math.floor(windowSize.height / CELL_SIZE_PX);
+
+    const width = viewportWidth > mapWidth ? mapWidth : viewportWidth;
+    const height = viewportHeight > mapHeight ? mapHeight : viewportHeight;
+
+    const startX = getStart(hero.x, width, mapWidth);
+    const startY = getStart(hero.y, height, mapHeight);
+
+    for (let y = startY; y < startY + height; y += 1) {
         currentRow = [];
-        for (let x = 0; x < width; x += 1) {
+        for (let x = startX; x < startX + width; x += 1) {
             if (visibilityArea && visibilityArea.indexOf(getItemID(x, y)) === -1) {
                 currentCellStyle = 'map-cell-invisible';
             } else {
@@ -43,7 +62,6 @@ function Grid({ map, visibilityArea }) {
                 }
             }
 
-
             if (!map[x][y]) {
                 throw new Error(`Undefined cell: ${x}, ${y}`);
             }
@@ -66,8 +84,10 @@ function Grid({ map, visibilityArea }) {
 }
 
 Grid.propTypes = {
+    hero: PropTypes.object.isRequired,
     map: PropTypes.array.isRequired,
-    visibilityArea: PropTypes.array
+    visibilityArea: PropTypes.array,
+    windowSize: PropTypes.object.isRequired
 };
 
 Grid.defaultProps = {

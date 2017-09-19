@@ -8,7 +8,7 @@ import Constants from './../Constants';
 const { EMPTY, DUNGEON, HERO, ENEMY, HEALTHPOINT } = Constants.CellState;
 const { FULL, LIMITED, VISIBILITYRADIUS } = Constants.Visibility;
 const { ENEMIESDENSITY, HEALTHPOINTSDENSITY } = Constants.ItemsDensity;
-const { GAME, LOSS, WIN } = Constants.GameState;
+const { LOADING, GAME, LOSS, WIN } = Constants.GameState;
 const { E_MINHEALTH, E_HEALTHDEVIATION, E_MINDAMAGE, E_DAMAGEDEVIATION } = Constants.Enemy;
 const { HP_MINHEALTH, HP_HEALTHDEVIATION } = Constants.HealthPoints;
 const { H_INITIALHEALTH } = Constants.Hero;
@@ -64,11 +64,25 @@ class App extends React.Component {
 
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.toggleVisibility = this.toggleVisibility.bind(this);
+        this.setWindowSize = this.setWindowSize.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         window.addEventListener('keydown', this.handleKeyDown);
+        window.addEventListener('resize', this.setWindowSize);
         this.initGame();
+    }
+
+    setWindowSize() {
+        if (this.gameBoard) {
+            const windowSize = {
+                height: this.gameBoard.clientHeight,
+                width: this.gameBoard.clientWidth
+            };
+            this.setState({ windowSize });
+        } else {
+            console.error('Cannot get gameboard size!');
+        }
     }
 
     initGame() {
@@ -85,6 +99,7 @@ class App extends React.Component {
             $merge: { enemiesLeft: Object.keys(enemies).length }
         });
         const gameState = GAME;
+        this.setWindowSize();
         this.setState({ width, height, map, hero, enemies, healthPoints, gameInfo, gameState });
     }
 
@@ -317,12 +332,20 @@ class App extends React.Component {
 
     render() {
         let gameBoard;
-        if (this.state.gameState === GAME) {
+        if (this.state.gameState === LOADING) {
+            gameBoard = (
+                <h1>
+                    LOADING
+                </h1>
+            );
+        } else if (this.state.gameState === GAME) {
             const visibilityArea = this.state.visibility === FULL ? null : this.setVisibilityArea();
             gameBoard = (
                 <Map
+                    hero={this.state.hero}
                     map={this.state.map}
                     visibilityArea={visibilityArea}
+                    windowSize={this.state.windowSize}
                 />
             );
         } else if (this.state.gameState === LOSS) {
@@ -349,8 +372,12 @@ class App extends React.Component {
                         onVisibilitySwitch={this.toggleVisibility}
                     />
                 </div>
-                <div className="game-board">
-                    {gameBoard}
+                <div
+                    className="game-board"
+                    ref={(c) => { this.gameBoard = c; }}
+                >
+
+                {gameBoard}
                 </div>
             </div>
         );

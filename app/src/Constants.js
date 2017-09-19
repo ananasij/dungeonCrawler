@@ -1,5 +1,6 @@
 const Constants = {
     GameState: {
+        LOADING: 'LOADING',
         GAME: 'GAME',
         WIN: 'WIN',
         LOSS: 'LOSS'
@@ -17,6 +18,7 @@ const Constants = {
         HEALTHPOINT: 'HEALTHPOINT'
     },
     Map: {
+        CELL_SIZE_PX: 15,
         WIDTH: 50,
         HEIGHT: 60,
         MINROOMSIDE: 5,
